@@ -51,7 +51,10 @@ An experiment in controlling the size of a thread pool using a PID controller.
 
 ## How it works
 
-![](img/elastically-scalable-thread-pools-1.0-0.0-0.0.svg){ width= 400px }
+![](img/elastically-scalable-thread-pools-1.0-0.0-0.0.svg){ width=400px }
+
+![](img/elastically-scalable-thread-pools-1.0-5.0e-2-0.0.svg){ width=400px }
+
 
 ## Contributing
 
