@@ -55,6 +55,8 @@ An experiment in controlling the size of a thread pool using a PID controller.
 
 ![](img/elastically-scalable-thread-pools-1.0-5.0e-2-0.0.svg){ width=400px }
 
+![](img/elastically-scalable-thread-pools-1.0-5.0e-2-5.0e-2.svg)
+
 
 ## Contributing
 
@@ -72,6 +74,8 @@ An experiment in controlling the size of a thread pool using a PID controller.
 
 * We've looked at scaling up and down on a single machine (vertical scaling),
   what about scaling out and in across multiple machines (horizontal scaling)?
+
+* Simulate rather than generate load
 
 ## See also
 
