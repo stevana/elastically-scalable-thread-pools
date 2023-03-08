@@ -51,6 +51,8 @@ An experiment in controlling the size of a thread pool using a PID controller.
 
 ## How it works
 
+![](img/elastically-scalable-thread-pools-1.0-0.0-0.0.svg){ width= 400px }
+
 ## Contributing
 
 * Determinism, shards (odd/even, mod N) instead of pools a la Disruptor
