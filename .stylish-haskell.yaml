@@ -1,0 +1,25 @@
+steps:
+  - imports:
+      align: none
+      list_align: with_module_name
+      pad_module_names: false
+      long_list_align: new_line_multiline
+      empty_list_align: inherit
+      list_padding: 7 # length "import "
+      separate_lists: false
+      space_surround: false
+  - language_pragmas:
+      style: vertical
+      align: false
+      remove_redundant: true
+  - simple_align:
+      cases: false
+      top_level_patterns: false
+      records: false
+  - trailing_whitespace: {}
+
+# You need to put any language extensions that's enabled for the entire project
+# here.
+language_extensions: []
+
+columns: 72
