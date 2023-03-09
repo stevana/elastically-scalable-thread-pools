@@ -24,7 +24,7 @@ monitor p@(Pool _ inQueue _ _ _) dt eventQueue = go 0
     go t = do
       l <- lengthQueue inQueue
       w <- readIORef (pWorkerCount p)
-      print (l, w)
+      -- print (l, w)
       atomically (writeTQueue eventQueue (Event t l w))
       threadDelay dt
       go (t + dt)

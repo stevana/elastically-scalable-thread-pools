@@ -22,7 +22,7 @@ newPool worker inQueue outQueue = Pool worker inQueue outQueue [] <$> newIORef 0
 
 scaleUp :: Pool -> IO Pool
 scaleUp (Pool worker inQueue outQueue pids count) = do
-  putStrLn "scaling up"
+  -- putStrLn "scaling up"
   pid <- async go
   modifyIORef' count (+ 1)
   return (Pool worker inQueue outQueue (pid : pids) count)
@@ -37,7 +37,7 @@ scaleDown :: Pool -> IO Pool
 scaleDown p = case pWorkers p of
   []         -> return p
   pid : pids -> do
-    putStrLn "scaling down"
+    -- putStrLn "scaling down"
     cancel pid
     modifyIORef' (pWorkerCount p) (\i -> i - 1)
     return p { pWorkers = pids }

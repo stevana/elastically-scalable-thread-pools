@@ -24,14 +24,13 @@ libMain = do
   let worker _ = threadDelay 25000
   p  <- newPool worker q q'
   putStrLn "Start generating"
-  ag <- async (generator q () 60 0.1 60)
   am <- async (monitor p 500000 evQ)
   let kp = 1
       ki = 0.05
-      kd = 0.05
+      kd = 0.01
       dt = 0.01
   ac <- async (controller kp ki kd dt p)
-  wait ag
+  generator q () 100 0.1 60
   putStrLn "Done generating, waiting for queue to empty..."
   threadDelay 500_000
   mapM_ cancel  [am, ac]

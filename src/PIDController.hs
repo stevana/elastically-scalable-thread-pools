@@ -45,7 +45,7 @@ controller kp ki kd dt p0@(Pool _ inQueue _ _ _) = go p0 (newPIDState sp kp ki k
     go p s = do
       n <- lengthQueue inQueue
       let (s', o) = step (realToFrac n) dt s
-      putStrLn ("controller, output: " ++ show o)
+      -- putStrLn ("controller, output: " ++ show o)
       p' <- if o <= -100 then scaleUp p else if o >= -20 then scaleDown p else return p
       threadDelay (round (dt * 1_000_000))
       go p' s'
