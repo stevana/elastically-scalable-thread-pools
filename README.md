@@ -116,17 +116,27 @@ process id from `pool.pids`.
 
 ### Load generator
 
+In order to create work load that varies over time we use the sine function. The
+sine function oscillates between $-1$ and $1$:
+
 ![](img/sine.svg)
 
+We would like to have it oscillate between $0$ and some max value $m$. By
+multiplying the output of the sine function by $m/2$ we get an oscillation
+between $-m/2$ and $m/2$, we can then add $m/2$ to make it oscillate between $0$
+and $m$.
+
+We'll sample the resulting function once every `timesStep` seconds, this gives
+us the amout of work items (`n`) to create we then spread those out evenly in
+time, rinse and repeat until we reach some `endTime`.
+
 ```
-sineLoadGenerator inQueue workItem maxItems timeStep timeTotal =
-
-  for (t := 0; t < timeTotal; t += timeStep)
-    // The sine oscillates between -1 and 1, we want it to oscillate between 0 and maxItems, so we m
+sineLoadGenerator inQueue workItem maxItems timeStep endTime =
+  for t := 0; t < endtime; t += timeStep
     n := sin(t) * maxItems / 2 + maxItems / 2
-
-
-             replicateM_ (round n) (writeQueue q x >> threadDelay (round (dt * 1e6 / n)))
+    for i := 0; i < n; i++
+      writeQueue inQueue workItem
+      sleep (timeStep / n)
 ```
 
 ### PID controller
