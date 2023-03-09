@@ -116,7 +116,7 @@ process id from `pool.pids`.
 
 ### Load generator
 
-![](https://en.wikipedia.org/wiki/Sine_and_cosine#/media/File:Sine_cosine_one_period.svg)
+![](img/sine.svg)
 
 ```
 sineLoadGenerator inQueue workItem maxItems timeStep timeTotal =
