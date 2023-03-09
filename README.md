@@ -168,22 +168,22 @@ We start off by only setting the proportional part and keeping the integral and
 derivative part zero, this is called a P-controller. We see below that it will
 scale the worker count up and down proportionally to the sine wave shaped load:
 
-![](img/elastically-scalable-thread-pools-1.0-0.0-0.0.svg){ width=400px }
+![](img/elastically-scalable-thread-pools-1.0-0.0-0.0.svg)
 
 A P-controller only focuses on the *now*. In order to smooth things out we
 introduce the integral part, i.e. a PI-controller. The integral part takes the
 *past* into account. We see now that the worker count stabilises at 28:
 
-![](img/elastically-scalable-thread-pools-1.0-5.0e-2-0.0.svg){ width=400px }
+![](img/elastically-scalable-thread-pools-1.0-5.0e-2-0.0.svg)
 
 We can improve on this by adding the derivative part which takes the *future*
 into account. We then see that it stabilises at 26 workers:
 
-![](img/elastically-scalable-thread-pools-1.0-5.0e-2-5.0e-2.svg){ width=400px }
+![](img/elastically-scalable-thread-pools-1.0-5.0e-2-5.0e-2.svg)
 
-With the full PID-controller rather than the PI-controller we see that the queue
-length spikes up to 20 or so each time the work load generator hits one of the
-sine function's peaks.
+With the full PID-controller, which stabilises using less workers than the
+PI-controller, we see that the queue length spikes up to 20 or so each time the
+work load generator hits one of the sine function's peaks.
 
 ## Contributing
 
