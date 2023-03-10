@@ -16,8 +16,8 @@ import PIDController
 
 ------------------------------------------------------------------------
 
-libMain :: IO ()
-libMain = do
+libMain :: Double -> Double -> Double -> IO ()
+libMain kp ki kd = do
   q  <- newQueue 65536
   q' <- newQueue 65536
   evQ <- newTQueueIO
@@ -25,10 +25,7 @@ libMain = do
   p  <- newPool worker q q'
   putStrLn "Start generating"
   am <- async (monitor p 500000 evQ)
-  let kp = 1
-      ki = 0.05
-      kd = 0.01
-      dt = 0.01
+  let dt = 0.01
   ac <- async (controller kp ki kd dt p)
   generator q () 100 0.1 60
   putStrLn "Done generating, waiting for queue to empty..."

@@ -45,7 +45,7 @@ library
   default-language: Haskell2010
   ghc-options:      -Wall
 
-executable elastically-scalable-thread-pools
+executable app
   main-is:          Main.hs
   build-depends:
     , base
