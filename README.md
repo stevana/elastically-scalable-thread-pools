@@ -6,14 +6,23 @@ An experiment in controlling the size of a thread pool using a PID controller.
 
 ## Motivation
 
-Imagine a situation where you got some input queue, some processor of those
-inputs and an output queue where the processor writes its results:
+Imagine a situation where you got some input and output queue with some
+processor in-between:
 
 ```mermaid
 flowchart LR
-    I[\Input queue\] --> P{Processor} --> O[\Output queue\]
+    I([Input queue]) --> P{Processor} --> O([Output queue])
 ```
 
+Such situtation can for example arise in parallel processing pipelines where
+each processor is a stage in the pipeline:
+
+```mermaid
+flowchart LR
+    Q1([Queue 1]) --> S1{Stage 1} --> Q2([Queue 2]) --> S2{Stage 2} --> Q3([Queue 3])
+```
+
+Situations like this are common in parallel processing pipelines. If o
 
 * Split work up in stages, pipelining
 * If one stage is slow, throw an extra thread on it
