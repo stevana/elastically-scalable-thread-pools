@@ -135,8 +135,8 @@ sineLoadGenerator inQueue workItem maxItems timeStep endTime =
   for t := 0; t < endtime; t += timeStep
     n := sin(t) * maxItems / 2 + maxItems / 2
     for i := 0; i < n; i++
-      writeQueue inQueue workItem
-      sleep (timeStep / n)
+      writeQueue(inQueue, workItem)
+      sleep(timeStep / n)
 ```
 
 ### PID controller
@@ -170,7 +170,7 @@ scale the worker count up and down proportionally to the sine wave shaped load:
 
 ![](img/elastically-scalable-thread-pools-1.0-0.0-0.0.svg)
 
-A P-controller only focuses on the *now*. In order to smooth things out we
+A P-controller only focuses on the *present*. In order to smooth things out we
 introduce the integral part, i.e. a PI-controller. The integral part takes the
 *past* into account. We see now that the worker count stabilises at 28:
 
@@ -187,11 +187,13 @@ work load generator hits one of the sine function's peaks.
 
 ## Contributing
 
+* Max number of threads
+
 * Determinism, shards (odd/even, mod N) instead of pools a la Disruptor
   - orthonogal
   - but makes testing easier
 
-* Larger pipelines, is it enough to
+* Larger pipelines, is it enough to control each individual stage separately?
 
 * Controlling other things, e.g. batch size?
 
@@ -205,21 +207,46 @@ work load generator hits one of the sine function's peaks.
 * Simulate rather than generate load
 
 * More principled way of tuning the PID controller?
+  https://en.wikipedia.org/wiki/PID_controller#Overview_of_tuning_methods
 
 ## See also
 
-* https://www.researchgate.net/publication/265611546_A_Review_of_Auto-scaling_Techniques_for_Elastic_Applications_in_Cloud_Environments
-  - benchmark suites
-  - 709 citations
+While control theory is sometimes mentioned in the context of distributed
+systems, I haven't really seen it be used for simple things like controlling the
+size of a thread pool before. Perhaps it's because when you get to the scale
+where control theory is necessary then the examples are not so easy to explain
+in an understandable way anymore. Either way the following, pretty well cited,
+[survey](https://www.researchgate.net/publication/265611546_A_Review_of_Auto-scaling_Techniques_for_Elastic_Applications_in_Cloud_Environments)
+of auto-scaling techniques does mention PID-controllers.
 
-  - https://www.youtube.com/watch?v=BOKqGPWXwk0
-  - [SEDA: An Architecture for Well-Conditioned Scalable Internet
-    Services](https://people.eecs.berkeley.edu/~brewer/papers/SEDA-sosp.pdf)
-  - https://people.eecs.berkeley.edu/~brewer/papers/SEDA-sosp.pdf
+The paper that I got the idea from, [SEDA: An Architecture for Well-Conditioned
+Scalable Internet
+Services](https://people.eecs.berkeley.edu/~brewer/papers/SEDA-sosp.pdf),
+doesn't really use control theory but rather a threshold approach (also
+discussed in the above mentioned survey paper):
 
-* [PID Controller Implementation in
-  Software](https://youtube.com/watch?v=zOByx3Izf5U)
+> The controller periodically samples the input queue (once per second by
+> default) and adds a thread when the queue length exceeds some threshold (100
+> events by default). Threads are removed from a stage when they are idle for a
+> specified period of time (5 seconds by default).
 
-* [Control theory](https://en.wikipedia.org/wiki/Control_theory)
-  - [Robust Control Theory](https://users.ece.cmu.edu/~koopman/des_s99/control_theory/)
-  - [PID tuning](https://en.wikipedia.org/wiki/PID_controller#Loop_tuning)
+The SEDA authors do however say that:
+
+> Under SEDA, the body of work on control systems can be brought to bear on
+> service resource management, and we have only scratched the surface of the
+> potential for this technique.
+
+A bit more explaination is provided by Matt Welsh, who is one of the author, in
+his PhD
+[thesis](https://cs.uwaterloo.ca/~brecht/servers/readings-new/mdw-phdthesis.pdf)
+(2002):
+
+> A benefit to ad hoc controller design is that it does not rely on complex
+> models and parameters that a system designer may be unable to understand or to
+> tune. A common complaint of classic PID controller design is that it is often
+> difficult to understand the effect of gain settings.
+
+So I think it's a valid approach. It could be that classic PID-controllers are
+not suitable for the unpredictable internet traffic loads, but I'd be surprised
+if more [advanced](https://users.ece.cmu.edu/~koopman/des_s99/control_theory/)
+(robust) control theory hasn't already dealt with similar problems.
