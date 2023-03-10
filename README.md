@@ -249,4 +249,6 @@ his PhD
 So I think it's a valid approach. It could be that classic PID-controllers are
 not suitable for the unpredictable internet traffic loads, but I'd be surprised
 if more [advanced](https://users.ece.cmu.edu/~koopman/des_s99/control_theory/)
-(robust) control theory hasn't already dealt with similar problems.
+([robust](https://en.wikipedia.org/wiki/Robust_control) or
+[adaptive](https://en.wikipedia.org/wiki/Adaptive_control)) control theory
+hasn't already dealt with similar problems.
