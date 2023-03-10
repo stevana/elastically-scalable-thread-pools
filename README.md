@@ -6,6 +6,15 @@ An experiment in controlling the size of a thread pool using a PID controller.
 
 ## Motivation
 
+Imagine a situation where you got some input queue, some processor of those
+inputs and an output queue where the processor writes its results:
+
+```mermaid
+flowchart LR
+    I[\Input queue\] --> P{Processor} --> O[\Output queue\]
+```
+
+
 * Split work up in stages, pipelining
 * If one stage is slow, throw an extra thread on it
 * Spin up more threads
@@ -78,7 +87,7 @@ main =
   sineLoadGenerator(inQueue, 40, 0.1s, 60s)
 ```
 
-### Pool
+### Worker pool
 
 The worker pool itself is merely a struct which packs up the necessary data we
 need to be able to scale it up and down.
