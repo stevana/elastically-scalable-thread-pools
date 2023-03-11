@@ -14,7 +14,7 @@ flowchart LR
     I([Input queue]) --> P{Processor} --> O([Output queue])
 ```
 
-Such situtation can for example arise in parallel processing pipelines where
+Such situtation can, for example, arise in parallel processing pipelines where
 each processor is a stage in the pipeline:
 
 ```mermaid
@@ -22,27 +22,51 @@ flowchart LR
     Q1([Queue 1]) --> S1{Stage 1} --> Q2([Queue 2]) --> S2{Stage 2} --> Q3([Queue 3])
 ```
 
+In such situations it's unlikely that all stages take equal processing time. One
+way around this is to add more parallel processors to a stage.
 
-* Split work up in stages, pipelining
-* If one stage is slow, throw an extra thread on it
-* Spin up more threads
-  - decrease latency (waiting time in the queue)
-  - increase throughput (more enqueued items processed)
-* Spin down threads
-  - let some other stage use the CPU resources
-  - save energy/money
+Let's consider an example to make things more concrete. Let's say that the first
+queue contains some kind of requests that our service has received over the
+network. When they come in from the network they are raw byte strings, so the
+first stage will be parsing them into some data structure, while the second
+stage will be performing some validation. Let's assume that parsing is slower
+than validation, in this case we could try to make make up for parsing being
+slower by spawning multiple threads as part of the parsing stage.
+
+By spinning up more threads we can decrease latency (waiting time in the queue)
+and increase throughput (process more items), but we are also on the other hand
+using more energy and potentially hogging CPU resources that might be better
+used elsewhere in the pipeline or system at large.
+
+So here's the question: can we dynamically spin up and spin down threads at a
+stage in response to the input queue length for that stage?
 
 ## Plan
 
-* One stage of a pipeline
+Let's focus on a single stage of the pipeline to make things easier for ourselves.
 
+```mermaid
+flowchart LR
+    I([Input queue]) --> P{Processor} --> O([Output queue])
 ```
-   --->[In queue]--->[Worker pool]--->[Out queue]--->
-```
 
-* if in queue grows/shrinks, increase/decrease amount of workers in the pool
+We'd like to increase the parallelism of the processors if the input queue
+grows, and decrease it when the queue shrinks. One simple strategy might be to
+establish thresholds, i.e. if there's over $100$ items in the input queue then
+allocate more processors and if there's no items in the queue then deallocate
+them.
 
-* use PID controller to stabilise amount of workers even though work fluctuates
+Since allocating and deallocating processors can be an expense in itself, we'd
+like to avoid changing them processor count unnecessarily.
+
+The threshold based approach is sensitive to unnecessarily changing the count if
+the arrival rate of work fluctuates. The reason for this is because it only
+takes the *present* queue length into account.
+
+We can do better by also incorporating the *past* and trying to predict the
+*future*, this is the basic idea of PID controllers from control theory.
+
+Here's what the picture looks like with a PID controller in the loop:
 
 
 ```
@@ -58,6 +82,11 @@ flowchart LR
           +-------------------------------------------------+
 
 ```
+
+The PID controller monitors the queue length $y(t)$, compares it to some desired
+queue length $r(t)$ (also known as the setpoint) and calculates the error $e(t).
+The error determines the control variable $u(t)$ which is used to grow or shrink
+the processor pool.
 
 ## Pseudo-code
 
