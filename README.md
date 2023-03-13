@@ -26,12 +26,14 @@ In such situations it's unlikely that all stages take equal processing time. One
 way around this is to add more parallel processors to a stage.
 
 Let's consider an example to make things more concrete. Let's say that the first
-queue contains some kind of requests that our service has received over the
-network. When they come in from the network they are raw byte strings, so the
-first stage will be parsing them into some data structure, while the second
-stage will be performing some validation. Let's assume that parsing is slower
-than validation, in this case we could try to make make up for parsing being
-slower by spawning multiple threads as part of the parsing stage.
+queue contains some kind of requests that our system has received over the
+network. When the requests come in from the network they are raw byte strings,
+so the first stage will be parsing them into some data structure, while the
+second stage will be performing some validation (which might be interesting in
+order to avoid error handling in the later stages, which we've not included
+here). Let's assume that parsing is slower than validation, in this case we
+could try to make make up for parsing being slower by spawning multiple threads
+as part of the parsing stage.
 
 By spinning up more threads we can decrease latency (waiting time in the queue)
 and increase throughput (process more items), but we are also on the other hand
@@ -84,7 +86,7 @@ Here's what the picture looks like with a PID controller in the loop:
 ```
 
 The PID controller monitors the queue length $y(t)$, compares it to some desired
-queue length $r(t)$ (also known as the setpoint) and calculates the error $e(t).
+queue length $r(t)$ (also known as the setpoint) and calculates the error $e(t)$.
 The error determines the control variable $u(t)$ which is used to grow or shrink
 the processor pool.
 
