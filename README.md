@@ -14,7 +14,7 @@ flowchart LR
     I([Input queue]) --> P{Processor} --> O([Output queue])
 ```
 
-Such situtation can, for example, arise in parallel processing pipelines where
+Such situation can, for example, arise in parallel processing pipelines where
 each processor is a stage in the pipeline:
 
 ```mermaid
@@ -45,7 +45,8 @@ stage in response to the input queue length for that stage?
 
 ## Plan
 
-Let's focus on a single stage of the pipeline to make things easier for ourselves.
+Let's focus on a single stage of the pipeline to make things easier for
+ourselves.
 
 ```mermaid
 flowchart LR
@@ -66,7 +67,9 @@ the arrival rate of work fluctuates. The reason for this is because it only
 takes the *present* queue length into account.
 
 We can do better by also incorporating the *past* and trying to predict the
-*future*, this is the basic idea of PID controllers from control theory.
+*future*, this is the basic idea of [PID
+controllers](https://en.wikipedia.org/wiki/PID_controller) from [control
+theory](https://en.wikipedia.org/wiki/Control_theory).
 
 Here's what the picture looks like with a PID controller in the loop:
 
@@ -74,7 +77,7 @@ Here's what the picture looks like with a PID controller in the loop:
 ```
                                             +----------------------------------+
                                             |                                  |
-    -------------------------------------------->[In queue]--->[Worker pool]------->[Out queue]--->
+    ------------------------------------------->[Input queue]-->[Worker pool]----->[Output queue]-->
                                             |                                  |
      r(t)   e(t)                    u(t)    |                                  |
     ----->+------>[PID controller]--------> |                                  |
@@ -176,7 +179,7 @@ between $-m/2$ and $m/2$, we can then add $m/2$ to make it oscillate between $0$
 and $m$.
 
 We'll sample the resulting function once every `timesStep` seconds, this gives
-us the amout of work items (`n`) to create we then spread those out evenly in
+us the amount of work items (`n`) to create we then spread those out evenly in
 time, rinse and repeat until we reach some `endTime`.
 
 ```
@@ -208,13 +211,13 @@ loop:
 ```
 
 Where `Kp`, `Ki` and `Kd` is respectively the proportional, integral and
-derivative gain and `dt` is the loop interval time.
-
-The measured value is the input queue length and the setpoint, i.e. desired
-queue length, is set to zero.
-
-The `output` of the PID controller is used to determine if we scale up or down
-the worker pool.
+derivative gain and `dt` is the loop interval time. The proportional part acts
+on the *present* error value, the integral acts on the *past* and the derivative
+tries to predict the *future*. The measured value is the input queue length and
+the setpoint, i.e. desired queue length, is set to zero. If the `output` of the
+PID controller is less than $-100$ (i.e. the queue length is over $100$) then we
+scale up and if it's more than $-20$ (i.e. the queue length is less than $20$)
+then we scale down the worker pool.
 
 ## How it works
 
@@ -224,20 +227,22 @@ scale the worker count up and down proportionally to the sine wave shaped load:
 
 ![](img/elastically-scalable-thread-pools-1.0-0.0-0.0.svg)
 
-A P-controller only focuses on the *present*. In order to smooth things out we
-introduce the integral part, i.e. a PI-controller. The integral part takes the
-*past* into account. We see now that the worker count stabilises at 28:
+A P-controller only focuses on the *present*, and we see that it allocates and
+deallocates workers unnecessarily. In order to smooth things out we introduce
+the integral part, i.e. a PI-controller. The integral part takes the *past* into
+account. We see now that the worker count stabilises at $28$:
 
 ![](img/elastically-scalable-thread-pools-1.0-5.0e-2-0.0.svg)
 
 We can improve on this by adding the derivative part which takes the *future*
-into account. We then see that it stabilises at 26 workers:
+into account. We then see that it stabilises at $26$ workers:
 
 ![](img/elastically-scalable-thread-pools-1.0-5.0e-2-5.0e-2.svg)
 
 With the full PID controller, which stabilises using less workers than the
-PI-controller, we see that the queue length spikes up to 20 or so each time the
-work load generator hits one of the sine function's peaks.
+PI-controller, we see that the queue length spikes up to $20$ or so each time
+the work load generator hits one of the sine function's peaks. Recall that we
+started scaling down once the queue length was less than $20$.
 
 ## Usage
 
@@ -259,9 +264,10 @@ There are many ways we can build upon this experiment, here are a few ideas:
       some output queue then there's no guarantee that the order of the output
       items will be the same as the input items. We could solve this, and regain
       determinism, by using array based queues and shard on the index, i.e. even
-      indicies goes to one processor and odd to an ohter or more generally
+      indices goes to one processor and odd to an other or more generally
       modulus N can be used to shard between N processors. This is essentially
-      what the LMAX Disruptor does;
+      what the [LMAX
+      Disruptor](https://en.wikipedia.org/wiki/Disruptor_(software)) does;
 - [ ] We've only looked at one stage in a pipeline, what happens if we have
       multiple stages? is it enough to control each individual stage separately
       or do we need more global control?
@@ -276,54 +282,48 @@ There are many ways we can build upon this experiment, here are a few ideas:
 - [ ] We generated and processed real work items (by sleeping), could we do a
       discrete-event simulation instead to avoid having to wait for the sleeps?
 - [ ] I just picked random values for the PID controller parameters, there are
-      more principlined
+      more principled
       [ways](https://en.wikipedia.org/wiki/PID_controller#Overview_of_tuning_methods)
       of tuning the PID controller;
 - [ ] The PID controller we implemented merely followed the pseudo-code from
-      Wikipedia, there's probably better ways of implemtning it?
+      Wikipedia, there's probably better ways of implementing it?
 
 If any of this sounds interesting, feel free to get in touch!
 
 ## See also
 
-While control theory is sometimes mentioned in the context of distributed
-systems, I haven't really seen it be used for simple things like controlling the
-size of a thread pool before. Perhaps it's because when you get to the scale
-where control theory is necessary then the examples are not so easy to explain
-in an understandable way anymore. Either way the following, pretty well cited,
-[survey](https://www.researchgate.net/publication/265611546_A_Review_of_Auto-scaling_Techniques_for_Elastic_Applications_in_Cloud_Environments)
-of auto-scaling techniques does mention PID controllers.
+* [*A Review of Auto-scaling Techniques for Elastic Applications in Cloud
+  Environments*](https://www.researchgate.net/publication/265611546_A_Review_of_Auto-scaling_Techniques_for_Elastic_Applications_in_Cloud_Environments)
+  (2014) is a survey paper which talks about both threshold and PID controllers;
 
-The paper that I got the idea from, [SEDA: An Architecture for Well-Conditioned
-Scalable Internet
-Services](https://people.eecs.berkeley.edu/~brewer/papers/SEDA-sosp.pdf),
-doesn't really use control theory but rather a threshold approach (also
-discussed in the above mentioned survey paper):
+* [*SEDA: An Architecture for Well-Conditioned Scalable Internet
+  Services*](https://people.eecs.berkeley.edu/~brewer/papers/SEDA-sosp.pdf)
+  (2001), this is paper that I got the idea for elastic scalable thread pools.
+  They use a threshold approach rather than a PID controller, saying:
 
-> The controller periodically samples the input queue (once per second by
-> default) and adds a thread when the queue length exceeds some threshold (100
-> events by default). Threads are removed from a stage when they are idle for a
-> specified period of time (5 seconds by default).
+  > The controller periodically samples the input queue (once per second by
+  > default) and adds a thread when the queue length exceeds some threshold (100
+  > events by default). Threads are removed from a stage when they are idle for a
+  > specified period of time (5 seconds by default).
 
-The SEDA authors do however say that:
+  But also:
 
-> Under SEDA, the body of work on control systems can be brought to bear on
-> service resource management, and we have only scratched the surface of the
-> potential for this technique.
+  > Under SEDA, the body of work on control systems can be brought to bear on
+  > service resource management, and we have only scratched the surface of the
+  > potential for this technique.
 
-A bit more explaination is provided by Matt Welsh, who is one of the author, in
-his PhD
-[thesis](https://cs.uwaterloo.ca/~brecht/servers/readings-new/mdw-phdthesis.pdf)
-(2002):
+  A bit more explanation is provided by Matt Welsh, who is one of the author, in
+  his PhD
+  [thesis](https://cs.uwaterloo.ca/~brecht/servers/readings-new/mdw-phdthesis.pdf)
+  (2002):
 
-> A benefit to ad hoc controller design is that it does not rely on complex
-> models and parameters that a system designer may be unable to understand or to
-> tune. A common complaint of classic PID controller design is that it is often
-> difficult to understand the effect of gain settings.
+  > A benefit to ad hoc controller design is that it does not rely on complex
+  > models and parameters that a system designer may be unable to understand or to
+  > tune. A common complaint of classic PID controller design is that it is often
+  > difficult to understand the effect of gain settings.
 
-So I think it's a valid approach. It could be that classic PID controllers are
-not suitable for the unpredictable internet traffic loads, but I'd be surprised
-if more [advanced](https://users.ece.cmu.edu/~koopman/des_s99/control_theory/)
-([robust](https://en.wikipedia.org/wiki/Robust_control) or
-[adaptive](https://en.wikipedia.org/wiki/Adaptive_control)) control theory
-hasn't already dealt with similar problems.
+* It could very well be that the way we've applied classic PID controllers isn't
+  suitable for unpredicatable internet traffic loads. There are branches of
+  control theory might be better suited for this, see, for example,
+  [robust](https://en.wikipedia.org/wiki/Robust_control) and
+  [adaptive](https://en.wikipedia.org/wiki/Adaptive_control)) control theory.
