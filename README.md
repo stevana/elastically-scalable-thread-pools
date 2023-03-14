@@ -1,47 +1,49 @@
 # Elastically scalable thread pools
 
-*PLEASE DON'T SHARE JUST YET, WRITE UP STILL IN PROGRESS!*
-
 An experiment in controlling the size of a thread pool using a PID controller.
 
 ## Motivation
 
-Imagine a situation where you got some input and output queue with some
-processor in-between:
+A tried and tested way to achieve parallelism is to use pipelining. It's used
+extensively in manufacturing and in computer hardware.
+
+For example, Airbus [apparently](https://youtu.be/oxjT7veKi9c?t=2682) outputs
+two airplanes per day on average, even though it takes two months to build a
+single airplane from start to finish. It's also used inside CPUs to [pipeline
+instructions](https://en.wikipedia.org/wiki/Instruction_pipelining).
+
+Let's imagine we want to take advantage of pipelining in some software system.
+To make things more concrete, let's say we have a system where some kind of
+requests come on over the network and we want to process them in some way. The
+first stage of the pipeline is to parse the incoming requests from raw
+bytestrings into some more structured data, the second stage is to apply some
+validation logic to the parsed data and the third stage is to process the valid
+data and produce some outputs that are then sent back to the client or stored
+somewhere.
 
 ```mermaid
-flowchart LR
-    I([Input queue]) --> P{Processor} --> O([Output queue])
+  flowchart LR
+    Q1(Queue of bytestrings) --> S1((Parse)) --> Q2(Queue of data)
+    Q2--> S2((Validate)) --> Q3(Queue of valid data)
+    Q3--> S3((Process)) --> Q4(Queue of outputs)
 ```
 
-Such situation can, for example, arise in parallel processing pipelines where
-each processor is a stage in the pipeline:
-
-```mermaid
-flowchart LR
-    Q1([Queue 1]) --> S1{Stage 1} --> Q2([Queue 2]) --> S2{Stage 2} --> Q3([Queue 3])
-```
-
-In such situations it's unlikely that all stages take equal processing time. One
-way around this is to add more parallel processors to a stage.
-
-Let's consider an example to make things more concrete. Let's say that the first
-queue contains some kind of requests that our system has received over the
-network. When the requests come in from the network they are raw byte strings,
-so the first stage will be parsing them into some data structure, while the
-second stage will be performing some validation (which might be interesting in
-order to avoid error handling in the later stages, which we've not included
-here). Let's assume that parsing is slower than validation, in this case we
-could try to make make up for parsing being slower by spawning multiple threads
-as part of the parsing stage.
+The service time of an item can differ from stage to stage, for example parsing
+might be slower than validation, which can create bottlenecks. Luckily it's
+quite easy to spot bottlenecks by merely observing the queue lengths and once a
+slow stage is found we can often fix it by merely adding an additional parallel
+processor to that stage. For example we could spin up two or more threads that
+take bytestrings from the first queue and turn them into structured data and
+thereby compensate for parsing being slow.
 
 By spinning up more threads we can decrease latency (waiting time in the queue)
 and increase throughput (process more items), but we are also on the other hand
 using more energy and potentially hogging CPU resources that might be better
 used elsewhere in the pipeline or system at large.
 
-So here's the question: can we dynamically spin up and spin down threads at a
-stage in response to the input queue length for that stage?
+So here's the question that the rest of this post is concerned about: can we
+dynamically spin up and spin down threads at a stage in response to the input
+queue length for that stage?
 
 ## Plan
 
@@ -215,9 +217,10 @@ derivative gain and `dt` is the loop interval time. The proportional part acts
 on the *present* error value, the integral acts on the *past* and the derivative
 tries to predict the *future*. The measured value is the input queue length and
 the setpoint, i.e. desired queue length, is set to zero. If the `output` of the
-PID controller is less than $-100$ (i.e. the queue length is over $100$) then we
-scale up and if it's more than $-20$ (i.e. the queue length is less than $20$)
-then we scale down the worker pool.
+PID controller is less than $-100$ (i.e. the queue length is over $100$ taking
+the present, past and possible future into account) then we scale up and if it's
+more than $-20$ (i.e. the queue length is less than $20$) then we scale down the
+worker pool.
 
 ## How it works
 
@@ -326,4 +329,4 @@ If any of this sounds interesting, feel free to get in touch!
   suitable for unpredicatable internet traffic loads. There are branches of
   control theory might be better suited for this, see, for example,
   [robust](https://en.wikipedia.org/wiki/Robust_control) and
-  [adaptive](https://en.wikipedia.org/wiki/Adaptive_control)) control theory.
+  [adaptive](https://en.wikipedia.org/wiki/Adaptive_control) control theory.
