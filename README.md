@@ -52,7 +52,7 @@ ourselves.
 
 ```mermaid
 flowchart LR
-    I([Input queue]) --> P((Processor)) --> O([Output queue])
+    I(Input queue) --> P((Processor)) --> O(Output queue)
 ```
 
 We'd like to increase the parallelism of the processors if the input queue
