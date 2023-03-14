@@ -334,3 +334,12 @@ If any of this sounds interesting, feel free to get in touch!
 * My previous post: [*An experiment in declaratively programming parallel
   pipelines of state
   machines*](https://github.com/stevana/pipelined-state-machines#pipelined-state-machines).
+
+## Discussion
+
+* [Hacker News](https://news.ycombinator.com/item?id=35148068);
+* [lobste.rs](https://lobste.rs/s/ybtxic/experiment_elastically_scaling_thread);
+* [r/haskell](https://old.reddit.com/r/haskell/comments/11qyfw7/an_experiment_in_elastically_scaling_a_thread/);
+* Also see Glyn Normington's
+  [comment](https://github.com/stevana/elastically-scalable-thread-pools/issues/1)
+  in the issue tracker.
