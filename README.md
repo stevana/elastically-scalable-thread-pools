@@ -329,4 +329,8 @@ If any of this sounds interesting, feel free to get in touch!
   suitable for unpredictable internet traffic loads. There are branches of
   control theory might be better suited for this, see, for example,
   [robust](https://en.wikipedia.org/wiki/Robust_control) and
-  [adaptive](https://en.wikipedia.org/wiki/Adaptive_control) control theory.
+  [adaptive](https://en.wikipedia.org/wiki/Adaptive_control) control theory;
+
+* My previous post: [*An experiment in declaratively programming parallel
+  pipelines of state
+  machines*](https://github.com/stevana/pipelined-state-machines#pipelined-state-machines).
