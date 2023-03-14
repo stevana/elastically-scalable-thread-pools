@@ -326,7 +326,7 @@ If any of this sounds interesting, feel free to get in touch!
   > difficult to understand the effect of gain settings.
 
 * It could very well be that the way we've applied classic PID controllers isn't
-  suitable for unpredicatable internet traffic loads. There are branches of
+  suitable for unpredictable internet traffic loads. There are branches of
   control theory might be better suited for this, see, for example,
   [robust](https://en.wikipedia.org/wiki/Robust_control) and
   [adaptive](https://en.wikipedia.org/wiki/Adaptive_control) control theory.
