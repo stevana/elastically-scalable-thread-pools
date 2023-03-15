@@ -325,11 +325,28 @@ If any of this sounds interesting, feel free to get in touch!
   > tune. A common complaint of classic PID controller design is that it is often
   > difficult to understand the effect of gain settings.
 
+* There are many introductory text books on control theory, but there's a lot
+  less resources on how to apply control theory to software systems. Here are a
+  few resources:
+
+    - [*Feedback Control for Computer
+      Systems*](https://janert.org/books/feedback-control-for-computer-systems/)
+      book by Philipp K. Janert (2013);
+
+    - [*Tutorial: Recent Advances in the Application of Control Theory to
+      Network and Service
+      Management*](https://www.cse.wustl.edu/~lu/control-tutorials/im09/).
+
 * It could very well be that the way we've applied classic PID controllers isn't
   suitable for unpredictable internet traffic loads. There are branches of
   control theory might be better suited for this, see, for example,
   [robust](https://en.wikipedia.org/wiki/Robust_control) and
   [adaptive](https://en.wikipedia.org/wiki/Adaptive_control) control theory;
+
+* The .NET thread pool apparently uses the [hill
+  climbing](https://en.wikipedia.org/wiki/Hill_climbing) optimisation technique
+  to [elastically
+  scale](https://mattwarren.org/2017/04/13/The-CLR-Thread-Pool-Thread-Injection-Algorithm/);
 
 * My previous post: [*An experiment in declaratively programming parallel
   pipelines of state
