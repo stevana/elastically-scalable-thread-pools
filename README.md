@@ -21,7 +21,7 @@ validation logic to the parsed data and the third stage is to process the valid
 data and produce some outputs that are then sent back to the client or stored
 somewhere.
 
-![pipeline](https://github.com/stevana/elastically-scalable-thread-pools/tree/main/img/pipeline.svg)
+![pipeline](https://raw.githubusercontent.com/stevana/elastically-scalable-thread-pools/main/img/pipeline.svg)
 
 The service time of an item can differ from stage to stage, for example parsing
 might be slower than validation, which can create bottlenecks. Luckily it's
@@ -45,7 +45,7 @@ queue length for that stage?
 Let's focus on a single stage of the pipeline to make things easier for
 ourselves.
 
-![stage](https://github.com/stevana/elastically-scalable-thread-pools/tree/main/img/stage.svg)
+![stage](https://raw.githubusercontent.com/stevana/elastically-scalable-thread-pools/main/img/stage.svg)
 
 We'd like to increase the parallelism of the processors if the input queue
 grows, and decrease it when the queue shrinks. One simple strategy might be to
@@ -165,7 +165,7 @@ process id from `pool.pids`.
 In order to create work load that varies over time we use the sine function. The
 sine function oscillates between $-1$ and $1$:
 
-![sine](https://github.com/stevana/elastically-scalable-thread-pools/tree/main/img/sine.svg)
+![sine](https://raw.githubusercontent.com/stevana/elastically-scalable-thread-pools/main/img/sine.svg)
 
 We would like to have it oscillate between $0$ and some max value $m$. By
 multiplying the output of the sine function by $m/2$ we get an oscillation
@@ -220,19 +220,19 @@ We start off by only setting the proportional part and keeping the integral and
 derivative part zero, this is called a P-controller. We see below that it will
 scale the worker count up and down proportionally to the sine wave shaped load:
 
-![](https://github.com/stevana/elastically-scalable-thread-pools/tree/main/img/elastically-scalable-thread-pools-1.0-0.0-0.0.svg)
+![](https://raw.githubusercontent.com/stevana/elastically-scalable-thread-pools/main/img/elastically-scalable-thread-pools-1.0-0.0-0.0.svg)
 
 A P-controller only focuses on the *present*, and we see that it allocates and
 deallocates workers unnecessarily. In order to smooth things out we introduce
 the integral part, i.e. a PI-controller. The integral part takes the *past* into
 account. We see now that the worker count stabilises at $28$:
 
-![](https://github.com/stevana/elastically-scalable-thread-pools/tree/main/img/elastically-scalable-thread-pools-1.0-5.0e-2-0.0.svg)
+![](https://raw.githubusercontent.com/stevana/elastically-scalable-thread-pools/main/img/elastically-scalable-thread-pools-1.0-5.0e-2-0.0.svg)
 
 We can improve on this by adding the derivative part which takes the *future*
 into account. We then see that it stabilises at $26$ workers:
 
-![](https://github.com/stevana/elastically-scalable-thread-pools/tree/main/img/elastically-scalable-thread-pools-1.0-5.0e-2-5.0e-2.svg)
+![](https://raw.githubusercontent.com/stevana/elastically-scalable-thread-pools/main/img/elastically-scalable-thread-pools-1.0-5.0e-2-5.0e-2.svg)
 
 With the full PID controller, which stabilises using less workers than the
 PI-controller, we see that the queue length spikes up to $20$ or so each time
