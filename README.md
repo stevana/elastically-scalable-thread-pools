@@ -21,7 +21,7 @@ validation logic to the parsed data and the third stage is to process the valid
 data and produce some outputs that are then sent back to the client or stored
 somewhere.
 
-![pipeline](https://raw.githubusercontent.com/stevana/elastically-scalable-thread-pools/main/img/pipeline.svg)
+![](https://raw.githubusercontent.com/stevana/elastically-scalable-thread-pools/main/img/pipeline.svg)
 
 The service time of an item can differ from stage to stage, for example parsing
 might be slower than validation, which can create bottlenecks. Luckily it's
@@ -45,7 +45,7 @@ queue length for that stage?
 Let's focus on a single stage of the pipeline to make things easier for
 ourselves.
 
-![stage](https://raw.githubusercontent.com/stevana/elastically-scalable-thread-pools/main/img/stage.svg)
+![](https://raw.githubusercontent.com/stevana/elastically-scalable-thread-pools/main/img/stage.svg)
 
 We'd like to increase the parallelism of the processors if the input queue
 grows, and decrease it when the queue shrinks. One simple strategy might be to
@@ -165,7 +165,7 @@ process id from `pool.pids`.
 In order to create work load that varies over time we use the sine function. The
 sine function oscillates between $-1$ and $1$:
 
-![sine](https://raw.githubusercontent.com/stevana/elastically-scalable-thread-pools/main/img/sine.svg)
+![](https://raw.githubusercontent.com/stevana/elastically-scalable-thread-pools/main/img/sine.svg)
 
 We would like to have it oscillate between $0$ and some max value $m$. By
 multiplying the output of the sine function by $m/2$ we get an oscillation
